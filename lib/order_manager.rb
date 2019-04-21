@@ -5,6 +5,8 @@ class OrderManager
   attr_reader :orders_csv, :hospital_manager
   attr_accessor :orders
 
+  RESUPPLY_MAX_WAIT = 3600
+
   def initialize(orders_csv, hospital_manager)
     @orders_csv = orders_csv
     @hospital_manager = hospital_manager
@@ -21,7 +23,7 @@ class OrderManager
   end
 
   def late_resupply_orders(time)
-    resupply_orders(time).select{|o| o.received_time < time - (2 * 3600) }
+    resupply_orders(time).select{|o| o.received_time < time - RESUPPLY_MAX_WAIT }
   end
 
   def queue_order(received_time, hospital, priority)

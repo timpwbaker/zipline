@@ -29,9 +29,13 @@ resupply_dispatch_delays = []
 emergency_order_durations = []
 resupply_order_durations = []
 
+order_counts = []
+
 while current_time < end_time
   schedule = zip_scheduler.schedule_next_flight(current_time)
   if schedule
+
+    order_counts << schedule[:orders].length
 
     emergency_dispatch_delays << schedule[:orders]
       .select{|o| o[:priority] == "Emergency"}.map{|o| o[:dispatch_delay]}
@@ -49,6 +53,8 @@ while current_time < end_time
 end
 
 orders_count = [emergency_dispatch_delays, resupply_dispatch_delays].flatten.length
+average_stack = order_counts.inject{ |sum, el| sum + el }.to_f / order_counts.size
+
 emergency_dispatch_delay = emergency_dispatch_delays.flatten.inject{ |sum, el| sum + el }.to_f / emergency_dispatch_delays.size
 resupply_dispatch_delay = resupply_dispatch_delays.flatten.inject{ |sum, el| sum + el }.to_f / resupply_dispatch_delays.size
 
@@ -57,9 +63,10 @@ resupply_order_duration = resupply_order_durations.flatten.inject{ |sum, el| sum
 
 
 puts "Delivered #{orders_count} orders over #{schedule_count} flights"
+puts "Average stack of #{average_stack} orders"
 puts "\n"
-puts "Average emergency dispatch delay: #{emergency_dispatch_delay}"
-puts "Average resupply dispatch delay: #{resupply_dispatch_delay}"
+puts "Average emergency dispatch delay (seconds): #{emergency_dispatch_delay}"
+puts "Average resupply dispatch delay (seconds): #{resupply_dispatch_delay}"
 puts "\n"
-puts "Average emergency order duration: #{emergency_order_duration}"
-puts "Average resupply order duration: #{resupply_order_duration}"
+puts "Average emergency order duration (seconds): #{emergency_order_duration}"
+puts "Average resupply order duration (seconds): #{resupply_order_duration}"
